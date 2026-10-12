@@ -1,3 +1,4 @@
+
 name: Task Manager CI
 
 on:
@@ -10,20 +11,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      POSTGRES_PASSWORD: ci_test_password
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
+      - name: Create CI environment file
         run: |
-          python -m pip install --upgrade pip
-          pip install -r app/requirements.txt
-          pip install pytest httpx
+          printf 'POSTGRES_PASSWORD=%s\n' \
+            "$POSTGRES_PASSWORD" > app/.env
+
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/tasks; then
+              echo "API is responding"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API failed to start"
+          exit 1
 
       - name: Run API tests
-        run: pytest -v tests
+        run: |
+          python -m pip install pytest httpx
+          pytest -v tests
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
