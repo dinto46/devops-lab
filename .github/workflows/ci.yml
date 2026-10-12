@@ -23,6 +23,9 @@ jobs:
           printf 'POSTGRES_PASSWORD=%s\n' \
             "$POSTGRES_PASSWORD" > app/.env
 
+      - name: Build and Start Containers
+        run: docker compose up -d --build
+
       - name: Wait for API
         run: |
           for i in $(seq 1 30); do
@@ -43,3 +46,7 @@ jobs:
       - name: Show logs on failure
         if: failure()
         run: docker compose logs
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down
