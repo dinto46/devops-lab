@@ -1,8 +1,22 @@
+#Environment variables
+.env
+.env.*
+!.env.example
+app/.env
+
+#Python virtual environments
+.venv/
+venv/
+app/.venv/
+
+#Python generated files
 __pycache__/
 *.py[cod]
 *.pyc
-.venv/
-.env
-app/.env
+.pytest_cache/
+#IDE and OS Files 
 *.log
 .vscode/
+.idea/
+.DS_Store
+EOF
