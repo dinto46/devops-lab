@@ -16,20 +16,17 @@ services:
 
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/dinto46/devops-lab:latest
     restart: unless-stopped
     env_file:
-     - app/.env
+      - app/.env
     environment:
       DATABASE_URL: postgresql+psycopg2://taskmanager_user:${POSTGRES_PASSWORD}@db:5432/taskmanager
     ports:
-     - "8000:8000"
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
-
 
 volumes:
   postgres_data:
